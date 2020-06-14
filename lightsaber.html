@@ -71,24 +71,17 @@ const _makeCubeMesh = () => {
 const cubeMesh = _makeCubeMesh();
 scene.add(cubeMesh); */
 
-const lightsaberMesh = (() => {
+const lightsaberMesh = await (async () => {
   const object = new THREE.Object3D();
 
-  const loader = new GLTFLoader();
-  loader.load('lightsaber.glb', function(o) {
-    o = o.scene;
-    console.log('loaded lightsaber', o);
-    /* o.traverse(e => {
-      if (e.isMesh) {
-        e.receiveShadow = true;
-      }
-    }); */
-
-    // o.updateMatrixWorld();
-    object.add(o);
-  }, undefined, function(e) {
-    console.error(e);
+  const o = await new Promise((accept, reject) => {
+    new GLTFLoader().load('lightsaber.glb', function(o) {
+      o = o.scene;
+      // console.log('loaded lightsaber', o);
+      accept(o);
+    }, undefined, reject);
   });
+  object.add(o);
 
   const bladeMaterial = new THREE.MeshPhongMaterial({
     // color: 0x800000,
