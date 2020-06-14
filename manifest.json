@@ -2,5 +2,9 @@
   "name": "lightsaber",
   "description": "WebXR Lightsaber",
   "xr_type": "webxr-site@0.0.1",
-  "start_url": "lightsaber.html"
+  "start_url": "lightsaber.html",
+  "wearable": {
+    "hand": [1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1],
+    "back": [1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1]
+  }
 }
