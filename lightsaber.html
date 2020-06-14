@@ -1,0 +1,266 @@
+<!doctype html>
+<html>
+<body>
+<script type=module>
+import * as THREE from './three.module.js';
+window.THREE = THREE;
+</script>
+<script type=module>
+import {GLTFLoader} from './GLTFLoader.js';
+import {BufferGeometryUtils} from './BufferGeometryUtils.js';
+// import {OrbitControls} from './OrbitControls.js';
+
+(async () => {
+
+const localVector = new THREE.Vector3();
+const localVector2 = new THREE.Vector3();
+const localQuaternion = new THREE.Quaternion();
+const localEuler = new THREE.Euler();
+localEuler.order = 'YXZ';
+const localMatrix = new THREE.Matrix4();
+const localMatrix2 = new THREE.Matrix4();
+const localMatrixWorld = new THREE.Matrix4();
+const localVector2D = new THREE.Vector2();
+
+// const userId = Math.random().toString(36).replace(/[^a-z]+/g, '').substr(0, 5);
+
+const renderer = new THREE.WebGLRenderer({
+  antialias: true,
+  alpha: true,
+});
+// renderer.gammaOutput = true;
+// renderer.gammaFactor = 2.2;
+renderer.physicallyCorrectLights = true;
+// renderer.toneMappingExposure = 1;
+renderer.setPixelRatio(window.devicePixelRatio);
+renderer.setSize(window.innerWidth, window.innerHeight);
+renderer.sortObjects = false;
+// renderer.shadowMap.enabled = true;
+// renderer.shadowMap.type = THREE.PCFShadowMap;
+renderer.xr.enabled = true;
+document.body.appendChild(renderer.domElement);
+
+const scene = new THREE.Scene();
+scene.matrixAutoUpdate = false;
+
+const camera = new THREE.PerspectiveCamera(60, window.innerWidth/window.innerHeight, 0.1, 1000);
+scene.add(camera);
+
+/* const ambientLight = new THREE.AmbientLight(0x333333, 1);
+scene.add(ambientLight); */
+
+const directionalLight = new THREE.DirectionalLight(0xFFFFFF, 3);
+directionalLight.position.set(10, 30, 10);
+scene.add(directionalLight);
+
+/* const cubeGeometry = new THREE.BoxBufferGeometry(0.1, 0.1, 0.1);
+const _makeCubeMesh = () => {
+  const geometry = cubeGeometry;
+  const material = new THREE.MeshPhongMaterial({
+    color: 0x333333,
+  });
+  const mesh = new THREE.Mesh(geometry, material);
+  mesh.frustumCulled = false;
+  return mesh;
+};
+const cubeMesh = _makeCubeMesh();
+scene.add(cubeMesh); */
+
+const lightsaberMesh = (() => {
+  const object = new THREE.Object3D();
+
+  const loader = new GLTFLoader();
+  loader.load('lightsaber.glb', function(o) {
+    o = o.scene;
+    console.log('loaded lightsaber', o);
+    /* o.traverse(e => {
+      if (e.isMesh) {
+        e.receiveShadow = true;
+      }
+    }); */
+
+    // o.updateMatrixWorld();
+    object.add(o);
+  }, undefined, function(e) {
+    console.error(e);
+  });
+
+  const bladeMesh = (() => {
+    const geometry = BufferGeometryUtils.mergeBufferGeometries([
+      new THREE.BoxBufferGeometry(0.01, 0.01, 1).applyMatrix(new THREE.Matrix4().makeTranslation(0, 0, -1/2 - 0.17)),
+      new THREE.BoxBufferGeometry(0.1, 0.01, 0.01).applyMatrix(new THREE.Matrix4().makeTranslation(-0.1/2 - 0.06, 0, -0.145)),
+      new THREE.BoxBufferGeometry(0.1, 0.01, 0.01).applyMatrix(new THREE.Matrix4().makeTranslation(0.1/2 + 0.06, 0, -0.145)),
+    ]);
+    const material = new THREE.MeshPhongMaterial({
+      // color: 0x800000,
+      color: 0xFF4040,
+    });
+    const mesh = new THREE.Mesh(geometry, material);
+    mesh.visible = false;
+    mesh.frustumCulled = false;
+    return mesh;
+  })();
+  bladeMesh.visible = false;
+  object.add(bladeMesh);
+
+  object.setState = enabled => {
+    bladeMesh.visible = enabled;
+  };
+
+  /* object.grabIndex = -1;
+  window.document.dataset.addEventListener('change', e => {
+    const {key, value} = e.detail;
+    if (key === 'enabled') {
+      bladeMesh.visible = value;
+    }
+  });
+  object.setState = enabled => {
+    window.document.dataset.set('enabled', enabled);
+  };
+  object.getEquipper = () => window.document.dataset.get('equipper');
+  object.setEquipper = equipper => {
+    window.document.dataset.set('equipper', equipper);
+  }; */
+
+  return object;
+})();
+scene.add(lightsaberMesh);
+
+/* const cubeGeometry = new THREE.BoxBufferGeometry(0.02, 0.01, 0.05);
+const _makeCubeMesh = () => {
+  const geometry = cubeGeometry;
+  const material = new THREE.MeshPhongMaterial({
+    color: 0x333333,
+  });
+  const mesh = new THREE.Mesh(geometry, material);
+  mesh.frustumCulled = false;
+  return mesh;
+};
+const cubeMeshes = [
+  _makeCubeMesh(),
+  _makeCubeMesh(),
+];
+scene.add(cubeMeshes[0]);
+scene.add(cubeMeshes[1]); 
+
+const cameraCubeMesh = (() => {
+  const geometry = new THREE.BoxBufferGeometry(0.5, 0.5, 0.5);
+  const material = new THREE.MeshPhongMaterial({
+    color: 0x333333,
+  });
+  const mesh = new THREE.Mesh(geometry, material);
+  mesh.frustumCulled = false;
+  return mesh;
+})()
+// scene.add(cameraCubeMesh); */
+
+/* const session = await navigator.xr.requestSession();
+session.layers && session.layers.push(renderer.domElement);
+session.requestAnimationFrame((timestamp, frame) => {
+  renderer.vr.setSession(session, {
+    frameOfReferenceType: 'stage',
+  });
+
+  const pose = frame.getViewerPose();
+  const viewport = session.baseLayer.getViewport(pose.views[0]);
+  const height = viewport.height;
+  const fullWidth = (() => {
+    let result = 0;
+    for (let i = 0; i < pose.views.length; i++) {
+      result += session.baseLayer.getViewport(pose.views[i]).width;
+    }
+    return result;
+  })();
+  renderer.setSize(fullWidth, height);
+  renderer.setPixelRatio(1);
+
+  renderer.setAnimationLoop(null);
+
+  renderer.vr.enabled = true;
+  renderer.vr.setSession(session);
+  renderer.vr.setAnimationLoop(animate);
+}); */
+
+/* const lastPresseds = Array(cubeMeshes.length).fill(false);
+const lastGrabbeds = Array(cubeMeshes.length).fill(false);
+const _setMatrixWorld = matrixWorld => {
+  localMatrixWorld
+    .compose(
+      localVector.fromArray(window.document.xrOffset.position),
+      localQuaternion.fromArray(window.document.xrOffset.orientation),
+      localVector2.set(1, 1, 1)
+    )
+    .multiply(matrixWorld)
+    .decompose(localVector, localQuaternion, localVector2)
+  window.document.xrOffset.position = localVector.toArray();
+  window.document.xrOffset.orientation = localQuaternion.toArray();
+}; */
+let pressed = false;
+let lastUpdateTime = Date.now();
+function animate() {
+  const now = Date.now();
+  const timeDiff = now - lastUpdateTime;
+
+  /* const vrCamera = renderer.vr.enabled ? renderer.vr.getCamera(camera).cameras[0] : camera;
+  vrCamera.matrixWorld.decompose(vrCamera.position, vrCamera.quaternion, vrCamera.scale);
+  cameraCubeMesh.position.copy(vrCamera.position).add(localVector2.set(0, -0.5, 0)); */
+
+  if (timeDiff > 1000) {
+    pressed = !pressed;
+    lightsaberMesh.setState(pressed);
+    lastUpdateTime = now;
+  }
+
+  /* if (lightsaberMesh.getEquipper() === userId) {
+    localMatrix
+      .copy(vrCamera.matrixWorld)
+      .premultiply(
+        localMatrix2.fromArray(window.document.xrOffset.matrix)//.getInverse(localMatrix2)
+      )
+      .decompose(localVector, localQuaternion, localVector2);
+
+    localEuler.setFromQuaternion(localQuaternion, localEuler.order);
+    localEuler.x = 0;
+    localEuler.z = 0;
+    localQuaternion.setFromEuler(localEuler);
+
+    localVector
+      .add(localVector2.set(0, -0.5, 0))
+      .add(
+        localVector2
+          .set(0.2, 0, 0)
+          .applyQuaternion(localQuaternion)
+      );
+
+    window.document.xrOffset.position = localVector.toArray();
+    window.document.xrOffset.orientation = localQuaternion.toArray();
+  } */
+
+  renderer.render(scene, camera);
+}
+renderer.setAnimationLoop(animate);
+
+let currentSession = null;
+function onSessionStarted(session) {
+  session.addEventListener('end', onSessionEnded);
+
+  renderer.xr.setSession(session);
+
+  currentSession = session;
+}
+function onSessionEnded() {
+  currentSession.removeEventListener('end', onSessionEnded);
+
+  currentSession = null;
+}
+navigator.xr && navigator.xr.requestSession('immersive-vr', {
+  optionalFeatures: [
+    'local-floor',
+    'bounded-floor',
+  ],
+}).then(onSessionStarted);
+
+})();
+</script>
+</body>
+</html>
