@@ -87,15 +87,16 @@ const lightsaberMesh = (() => {
 
   const bladeMesh = (() => {
     const geometry = BufferGeometryUtils.mergeBufferGeometries([
-      new THREE.BoxBufferGeometry(0.01, 0.01, 1).applyMatrix(new THREE.Matrix4().makeTranslation(0, 0, -1/2 - 0.17)),
-      new THREE.BoxBufferGeometry(0.1, 0.01, 0.01).applyMatrix(new THREE.Matrix4().makeTranslation(-0.1/2 - 0.06, 0, -0.145)),
-      new THREE.BoxBufferGeometry(0.1, 0.01, 0.01).applyMatrix(new THREE.Matrix4().makeTranslation(0.1/2 + 0.06, 0, -0.145)),
+      new THREE.BoxBufferGeometry(0.01, 0.01, 1).applyMatrix(new THREE.Matrix4().makeTranslation(0, 0, -1/2 - 0.17 + 0.145)),
+      new THREE.BoxBufferGeometry(0.1, 0.01, 0.01).applyMatrix(new THREE.Matrix4().makeTranslation(-0.1/2 - 0.06, 0, 0)),
+      new THREE.BoxBufferGeometry(0.1, 0.01, 0.01).applyMatrix(new THREE.Matrix4().makeTranslation(0.1/2 + 0.06, 0, 0)),
     ]);
     const material = new THREE.MeshPhongMaterial({
       // color: 0x800000,
       color: 0xFF4040,
     });
     const mesh = new THREE.Mesh(geometry, material);
+    mesh.position.z = -0.145;
     mesh.visible = false;
     mesh.frustumCulled = false;
     return mesh;
@@ -103,8 +104,44 @@ const lightsaberMesh = (() => {
   bladeMesh.visible = false;
   object.add(bladeMesh);
 
+  let factor = 0;
+  let animation = null;
+  object.tick = () => {
+    if (animation) {
+      const {startFactor, endFactor, startTime, endTime} = animation;
+      const now = Date.now();
+      const lerp = Math.min(Math.max((now - startTime) / (endTime - startTime), 0), 1);
+      factor = startFactor + (endFactor - startFactor)*lerp;
+      bladeMesh.scale.set(factor, factor, factor);
+      bladeMesh.visible = factor > 0;
+      if (lerp >= 1) {
+        animation = null;
+      }
+      return true;
+    } else {
+      return false;
+    }
+  };
   object.setState = enabled => {
-    bladeMesh.visible = enabled;
+    if (enabled) {
+      const startTime = Date.now();
+      const endTime = startTime + 1000;
+      animation = {
+        startFactor: 0,
+        endFactor: 1,
+        startTime,
+        endTime,
+      };
+    } else {
+      const startTime = Date.now();
+      const endTime = startTime + 1000;
+      animation = {
+        startFactor: 1,
+        endFactor: 0,
+        startTime,
+        endTime,
+      };
+    }
   };
 
   /* object.grabIndex = -1;
@@ -196,20 +233,15 @@ const _setMatrixWorld = matrixWorld => {
   window.document.xrOffset.position = localVector.toArray();
   window.document.xrOffset.orientation = localQuaternion.toArray();
 }; */
-let pressed = false;
-let lastUpdateTime = Date.now();
+let enabled = false;
 function animate() {
-  const now = Date.now();
-  const timeDiff = now - lastUpdateTime;
-
   /* const vrCamera = renderer.vr.enabled ? renderer.vr.getCamera(camera).cameras[0] : camera;
   vrCamera.matrixWorld.decompose(vrCamera.position, vrCamera.quaternion, vrCamera.scale);
   cameraCubeMesh.position.copy(vrCamera.position).add(localVector2.set(0, -0.5, 0)); */
 
-  if (timeDiff > 1000) {
-    pressed = !pressed;
-    lightsaberMesh.setState(pressed);
-    lastUpdateTime = now;
+  if (!lightsaberMesh.tick()) {
+    enabled = !enabled;
+    lightsaberMesh.setState(enabled);
   }
 
   /* if (lightsaberMesh.getEquipper() === userId) {
