@@ -245,7 +245,7 @@ const lightsaberMesh = await (async () => {
   object.add(o);
 
   const topBladeMesh = (() => {
-    const geometry = new THREE.BoxBufferGeometry(0.015, 0.015, 1, 1, 1, 100).applyMatrix(new THREE.Matrix4().makeTranslation(0, 0, -1/2 - 0.165 + 0.145));
+    const geometry = new THREE.BoxBufferGeometry(0.01, 0.01, 1, 1, 1, 100).applyMatrix(new THREE.Matrix4().makeTranslation(0, 0, -1/2 - 0.165 + 0.145));
     const numAs = geometry.attributes.position.array.length/3;
     const as = new Float32Array(numAs);
     for (let i = 0; i < numAs; i++) {
