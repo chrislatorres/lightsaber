@@ -191,7 +191,7 @@ const lightsaberMesh = (() => {
 
   return object;
 })();
-lightsaberMesh.quaternion.setFromAxisAngle(new THREE.Vector3(1, 0, 0), Math.PI/2);
+lightsaberMesh.rotation.order = 'YXZ';
 scene.add(lightsaberMesh);
 
 /* const cubeGeometry = new THREE.BoxBufferGeometry(0.02, 0.01, 0.05);
@@ -268,6 +268,8 @@ function animate() {
   const now = Date.now();
   const timeDiff = now - lastUpdateTime;
 
+  lightsaberMesh.rotation.x = Math.PI/2 + Math.sin((now%2000)/2000 * Math.PI*2)*0.1;
+  lightsaberMesh.rotation.y = Math.sin((now%3000)/3000 * Math.PI*2);
   if (!lightsaberMesh.tick()) {
     lightsaberMesh.setState();
   }
