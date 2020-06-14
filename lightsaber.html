@@ -9,6 +9,9 @@ window.THREE = THREE;
 import {GLTFLoader} from './GLTFLoader.js';
 import {BufferGeometryUtils} from './BufferGeometryUtils.js';
 // import {OrbitControls} from './OrbitControls.js';
+import easing from './easing.js';
+
+const cubicBezier = easing(0, 1, 0, 1);
 
 (async () => {
 
@@ -113,14 +116,16 @@ const lightsaberMesh = (() => {
   })();
   object.add(sideBladeMesh);
 
-  let factor = 0;
   let animation = null;
   object.tick = () => {
     if (animation) {
       const {startFactor, endFactor, startTime, endTime} = animation;
       const now = Date.now();
       const lerp = Math.min(Math.max((now - startTime) / (endTime - startTime), 0), 1);
-      factor = startFactor + (endFactor - startFactor)*lerp;
+      let factor = startFactor + (endFactor - startFactor)*lerp;
+      if (endFactor > startFactor) {
+        factor = cubicBezier(factor);
+      }
       topBladeMesh.scale.set(1, 1, factor);
       sideBladeMesh.scale.set(factor, 1, 1);
       topBladeMesh.visible = sideBladeMesh.visible = factor > 0;
@@ -132,8 +137,9 @@ const lightsaberMesh = (() => {
       return false;
     }
   };
-  object.setState = enabled => {
-    if (enabled) {
+  let phase = 0;
+  object.setState = () => {
+    if (phase === 0) {
       const startTime = Date.now();
       const endTime = startTime + 1000;
       animation = {
@@ -142,7 +148,18 @@ const lightsaberMesh = (() => {
         startTime,
         endTime,
       };
-    } else {
+      phase = 1;
+    } else if (phase === 1) {
+      const startTime = Date.now();
+      const endTime = startTime + 2000;
+      animation = {
+        startFactor: 1,
+        endFactor: 1,
+        startTime,
+        endTime,
+      };
+      phase = 2;
+    } else if (phase === 2) {
       const startTime = Date.now();
       const endTime = startTime + 1000;
       animation = {
@@ -151,6 +168,9 @@ const lightsaberMesh = (() => {
         startTime,
         endTime,
       };
+      phase = 0;
+    } else {
+      throw new Error('unknown phase');
     }
   };
 
@@ -243,15 +263,13 @@ const _setMatrixWorld = matrixWorld => {
   window.document.xrOffset.position = localVector.toArray();
   window.document.xrOffset.orientation = localQuaternion.toArray();
 }; */
-let enabled = false;
+let lastUpdateTime = Date.now();
 function animate() {
-  /* const vrCamera = renderer.vr.enabled ? renderer.vr.getCamera(camera).cameras[0] : camera;
-  vrCamera.matrixWorld.decompose(vrCamera.position, vrCamera.quaternion, vrCamera.scale);
-  cameraCubeMesh.position.copy(vrCamera.position).add(localVector2.set(0, -0.5, 0)); */
+  const now = Date.now();
+  const timeDiff = now - lastUpdateTime;
 
   if (!lightsaberMesh.tick()) {
-    enabled = !enabled;
-    lightsaberMesh.setState(enabled);
+    lightsaberMesh.setState();
   }
 
   /* if (lightsaberMesh.getEquipper() === userId) {
