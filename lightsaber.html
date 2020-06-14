@@ -46,12 +46,14 @@ scene.matrixAutoUpdate = false;
 const camera = new THREE.PerspectiveCamera(60, window.innerWidth/window.innerHeight, 0.1, 1000);
 scene.add(camera);
 
-/* const ambientLight = new THREE.AmbientLight(0x333333, 1);
-scene.add(ambientLight); */
+const ambientLight = new THREE.AmbientLight(0xFFFFFF, 2);
+scene.add(ambientLight);
 
 const directionalLight = new THREE.DirectionalLight(0xFFFFFF, 3);
-directionalLight.position.set(10, 30, 10);
 scene.add(directionalLight);
+
+const directionalLight2 = new THREE.DirectionalLight(0xFFFFFF, 3);
+scene.add(directionalLight2);
 
 /* const cubeGeometry = new THREE.BoxBufferGeometry(0.1, 0.1, 0.1);
 const _makeCubeMesh = () => {
@@ -90,7 +92,7 @@ const lightsaberMesh = (() => {
     color: 0xFF4040,
   });
   const topBladeMesh = (() => {
-    const geometry = new THREE.BoxBufferGeometry(0.01, 0.01, 1).applyMatrix(new THREE.Matrix4().makeTranslation(0, 0, -1/2 - 0.17 + 0.145));
+    const geometry = new THREE.BoxBufferGeometry(0.0125, 0.0125, 1).applyMatrix(new THREE.Matrix4().makeTranslation(0, 0, -1/2 - 0.15 + 0.145));
     const mesh = new THREE.Mesh(geometry, bladeMaterial);
     mesh.position.z = -0.145;
     mesh.visible = false;
@@ -100,8 +102,8 @@ const lightsaberMesh = (() => {
   object.add(topBladeMesh);
   const sideBladeMesh = (() => {
     const geometry = BufferGeometryUtils.mergeBufferGeometries([
-      new THREE.BoxBufferGeometry(0.1, 0.01, 0.01).applyMatrix(new THREE.Matrix4().makeTranslation(-0.1/2 - 0.06, 0, 0)),
-      new THREE.BoxBufferGeometry(0.1, 0.01, 0.01).applyMatrix(new THREE.Matrix4().makeTranslation(0.1/2 + 0.06, 0, 0)),
+      new THREE.BoxBufferGeometry(0.1, 0.0125, 0.0125).applyMatrix(new THREE.Matrix4().makeTranslation(-0.1/2 - 0.06, 0, 0)),
+      new THREE.BoxBufferGeometry(0.1, 0.0125, 0.0125).applyMatrix(new THREE.Matrix4().makeTranslation(0.1/2 + 0.06, 0, 0)),
     ]);
     const mesh = new THREE.Mesh(geometry, bladeMaterial);
     mesh.position.z = -0.145;
