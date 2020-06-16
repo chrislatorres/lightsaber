@@ -152,8 +152,6 @@ const bladeMaterial = new THREE.ShaderMaterial({
   },
   vertexShader: `\
     #define LOG2 1.442695
-    precision highp float;
-    precision highp int;
     uniform vec3 uTime;
     uniform float factor;
     attribute float a;
@@ -193,8 +191,6 @@ const bladeMaterial = new THREE.ShaderMaterial({
     }
   `,
   fragmentShader: `\
-    precision highp float;
-    precision highp int;
     uniform float sunIntensity;
     uniform vec3 fogColor;
     uniform vec3 uTime;
