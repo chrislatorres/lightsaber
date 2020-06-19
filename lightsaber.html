@@ -234,6 +234,11 @@ const lightsaberMesh = await (async () => {
   const o = await new Promise((accept, reject) => {
     new GLTFLoader().load('lightsaber.glb', function(o) {
       o = o.scene;
+      o.traverse(o => {
+        if (o.isMesh) {
+          o.frustumCulled = false;
+        }
+      });
       // console.log('loaded lightsaber', o);
       accept(o);
     }, undefined, reject);
