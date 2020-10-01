@@ -5,8 +5,6 @@ import {renderer, scene, app} from 'app';
 // import {OrbitControls} from './OrbitControls.js';
 import easing from './easing.js';
 
-console.log('loaded 1');
-
 function murmurhash(key, seed = 1) {
   var remainder, bytes, h1, h1b, c1, c1b, c2, c2b, k1, i;
   
@@ -229,7 +227,6 @@ const lightsaberMesh = await (async () => {
 
   const o = await new Promise((accept, reject) => {
     new GLTFLoader().load(app.files['/lightsaber.glb'], function(o) {
-      console.log('loaded glb', o);
       o = o.scene;
       o.traverse(o => {
         if (o.isMesh) {
@@ -506,7 +503,6 @@ const _setMatrixWorld = matrixWorld => {
   window.document.xrOffset.position = localVector.toArray();
   window.document.xrOffset.orientation = localQuaternion.toArray();
 }; */
-console.log('set animation loop');
 let lastUpdateTime = Date.now();
 function animate() {
   const now = Date.now();
