@@ -2,7 +2,6 @@ import * as THREE from 'three';
 import {GLTFLoader} from 'GLTFLoader';
 import {BufferGeometryUtils} from 'BufferGeometryUtils';
 import {renderer, scene, app} from 'app';
-// import {OrbitControls} from './OrbitControls.js';
 import easing from './easing.js';
 
 function murmurhash(key, seed = 1) {
