@@ -432,7 +432,7 @@ const lightsaberMesh = await (async () => {
 // lightsaberMesh.position.y = 1;
 lightsaberMesh.rotation.order = 'YXZ';
 lightsaberMesh.rotation.x = Math.PI/2;
-scene.add(lightsaberMesh);
+app.object.add(lightsaberMesh);
 
 /* const cubeGeometry = new THREE.BoxBufferGeometry(0.02, 0.01, 0.05);
 const _makeCubeMesh = () => {
