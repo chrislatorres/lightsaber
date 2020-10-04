@@ -544,4 +544,10 @@ function animate() {
 }
 renderer.setAnimationLoop(animate);
 
+app.addEventListener('terminate', () => {
+  for (const particle of particles) {
+    scene.remove(particle);
+  }
+});
+
 })();
