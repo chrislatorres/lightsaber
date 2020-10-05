@@ -426,6 +426,12 @@ const lightsaberMesh = await (async () => {
     window.document.dataset.set('equipper', equipper);
   }; */
 
+  app.addEventListener('terminate', () => {
+    for (const particle of particles) {
+      scene.remove(particle);
+    }
+  });
+
   return object;
 })();
 // lightsaberMesh.position.y = 1;
@@ -543,11 +549,5 @@ function animate() {
   // renderer.render(scene, camera);
 }
 renderer.setAnimationLoop(animate);
-
-app.addEventListener('terminate', () => {
-  for (const particle of particles) {
-    scene.remove(particle);
-  }
-});
 
 })();
