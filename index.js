@@ -225,7 +225,7 @@ const lightsaberMesh = await (async () => {
   const object = new THREE.Object3D();
 
   const o = await new Promise((accept, reject) => {
-    new GLTFLoader().load(app.files['/lightsaber.glb'], function(o) {
+    new GLTFLoader().load(app.files['./lightsaber.glb'], function(o) {
       o = o.scene;
       o.traverse(o => {
         if (o.isMesh) {
