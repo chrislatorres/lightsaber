@@ -4,6 +4,15 @@ import {BufferGeometryUtils} from 'BufferGeometryUtils';
 import {renderer, scene, app} from 'app';
 import easing from './easing.js';
 
+let particleIntensity = 0.05;
+
+if (document.monetization) {
+  document.monetization.addEventListener('monetizationstart', () => {
+    particleIntensity = 4;
+    console.log("monetizationstarted!!!!!!!!!!!!");
+  })
+}
+
 function murmurhash(key, seed = 1) {
   var remainder, bytes, h1, h1b, c1, c1b, c2, c2b, k1, i;
   
@@ -291,7 +300,7 @@ const lightsaberMesh = await (async () => {
   })();
   object.add(sideBladeMesh);
 
-  const particleGeometry = new THREE.BoxBufferGeometry(0.02, 0.02, 0.02);
+  const particleGeometry = new THREE.BoxBufferGeometry(particleIntensity, particleIntensity, particleIntensity);
   let particles = [];
   let lastParticleTime = Date.now();
 
@@ -308,7 +317,7 @@ const lightsaberMesh = await (async () => {
         particle.rotation.x = Math.random()*Math.PI*2;
         particle.rotation.y = Math.random()*Math.PI*2;
         particle.rotation.z = Math.random()*Math.PI*2;
-        particle.scale.set(0.2 + Math.random(), 0.2 + Math.random(), 0.2 + Math.random());
+        particle.scale.set(particleIntensity + Math.random(), particleIntensity + Math.random(), particleIntensity + Math.random());
         particle.velocity = new THREE.Vector3(-0.5 + Math.random(), -0.5 + Math.random(), -0.5 + Math.random())
           .multiply(dv)
           .normalize()
